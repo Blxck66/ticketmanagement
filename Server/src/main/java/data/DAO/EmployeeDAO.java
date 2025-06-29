@@ -1,4 +1,4 @@
-package data.DTO;
+package data.DAO;
 
 
 import data.model.Employee;
@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EmployeeDTO {
+public class EmployeeDAO {
 
     private final Connection connection;
 
-    public EmployeeDTO(Connection connection) {
+    public EmployeeDAO(Connection connection) {
         this.connection = connection;
     }
 

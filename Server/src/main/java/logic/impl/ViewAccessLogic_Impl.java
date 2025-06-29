@@ -1,6 +1,6 @@
 package logic.impl;
 
-import data.DTOs;
+import data.DAOs;
 import data.model.*;
 import logic.ViewAccessLogic;
 
@@ -29,31 +29,31 @@ public class ViewAccessLogic_Impl extends UnicastRemoteObject implements ViewAcc
 
     @Override
     public List<Keyword> getKeywords() {
-        return DTOs.getInstance().getKeywordDTO().getAll();
+        return DAOs.getInstance().getKeywordDAO().getAll();
     }
 
     @Override
     public List<Ticket> getAnsweredTicketsOfCustomer(Customer customer) {
-        return DTOs.getInstance().getTicketDTO().getAnsweredTicketsByCustomer(customer.getCustomerId());
+        return DAOs.getInstance().getTicketDAO().getAnsweredTicketsByCustomer(customer.getCustomerId());
     }
 
     @Override
     public List<Ticket> getPendingTicketsOfCustomer(Customer customer) {
-        return DTOs.getInstance().getTicketDTO().getPendingTicketsByCustomer(customer.getCustomerId());
+        return DAOs.getInstance().getTicketDAO().getPendingTicketsByCustomer(customer.getCustomerId());
     }
 
     @Override
     public List<Ticket> getExampleAnsweredTicketsForKeywords(List<Keyword> keywords) {
-        return DTOs.getInstance().getTicketDTO().getTicketsByKeywords(keywords);
+        return DAOs.getInstance().getTicketDAO().getTicketsByKeywords(keywords);
     }
 
     @Override
     public List<Answer> getAnswersOfTicket(Ticket ticket, boolean finalAnswer) {
-        return DTOs.getInstance().getAnswerDTO().getAnswerByTicketId(ticket.getTicketID(), finalAnswer);
+        return DAOs.getInstance().getAnswerDAO().getAnswerByTicketId(ticket.getTicketID(), finalAnswer);
     }
 
     @Override
     public List<Ticket> getPendingTicketsOfEmployee(Employee employee) throws RemoteException {
-        return DTOs.getInstance().getTicketDTO().getPendingTicketsByEmployee(employee.getEmployeeId());
+        return DAOs.getInstance().getTicketDAO().getPendingTicketsByEmployee(employee.getEmployeeId());
     }
 }

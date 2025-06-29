@@ -1,4 +1,4 @@
-package data.DTO;
+package data.DAO;
 
 import data.model.Keyword;
 
@@ -9,11 +9,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KeywordDTO {
+public class KeywordDAO {
 
     private final Connection connection;
 
-    public KeywordDTO(Connection connection) {
+    public KeywordDAO(Connection connection) {
         this.connection = connection;
     }
 

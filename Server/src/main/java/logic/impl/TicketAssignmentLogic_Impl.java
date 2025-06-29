@@ -1,7 +1,7 @@
 package logic.impl;
 
-import data.DTO.EmployeeDTO;
-import data.DTOs;
+import data.DAO.EmployeeDAO;
+import data.DAOs;
 import data.model.Answer;
 import data.model.Employee;
 import data.model.Keyword;
@@ -35,13 +35,13 @@ public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements l
 
     @Override
     public void AssignNewTicketToEmployee(Ticket ticket, List<Keyword> keywords) throws RemoteException {
-        EmployeeDTO employeeDTO = DTOs.getInstance().getEmployeeDTO();
-        List<Employee> employeesSorted = employeeDTO.getEmployeesSorted();
+        EmployeeDAO employeeDAO = DAOs.getInstance().getEmployeeDAO();
+        List<Employee> employeesSorted = employeeDAO.getEmployeesSorted();
 
         ticket.setEmployeeId(employeesSorted.getFirst().getEmployeeId());
         ticket.setState("PENDING");
         try {
-            DTOs.getInstance().getTicketDTO().createTicket(ticket, keywords);
+            DAOs.getInstance().getTicketDAO().createTicket(ticket, keywords);
         } catch (SQLException ignored) {
             ignored.printStackTrace();
         }
@@ -51,8 +51,8 @@ public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements l
     @Override
     public void assignTicketToCustomer(Ticket ticket, Answer answer) throws RemoteException {
         ticket.setState("ANSWERED");
-        DTOs.getInstance().getTicketDTO().updateTicket(ticket);
-        DTOs.getInstance().getAnswerDTO().createAnswer(answer);
+        DAOs.getInstance().getTicketDAO().updateTicket(ticket);
+        DAOs.getInstance().getAnswerDAO().createAnswer(answer);
     }
 
     @Override
@@ -60,12 +60,12 @@ public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements l
 
         ticket.setState("PENDING");
 
-        List<Employee> employeesSorted = DTOs.getInstance().getEmployeeDTO().getEmployeesSorted();
+        List<Employee> employeesSorted = DAOs.getInstance().getEmployeeDAO().getEmployeesSorted();
         employeesSorted.removeIf(employee -> employee.getEmployeeId().equals(ticket.getEmployeeId()));
         ticket.setEmployeeId(employeesSorted.getFirst().getEmployeeId());
         ticket.setIssueDate(LocalDateTime.now());
 
-        DTOs.getInstance().getTicketDTO().updateTicket(ticket);
+        DAOs.getInstance().getTicketDAO().updateTicket(ticket);
 
 
     }
@@ -74,7 +74,7 @@ public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements l
     public void unassignTicked(Ticket ticket) throws RemoteException {
         ticket.setState("CLOSED");
         ticket.setAssignmentDate(LocalDateTime.now());
-        DTOs.getInstance().getTicketDTO().updateTicket(ticket);
+        DAOs.getInstance().getTicketDAO().updateTicket(ticket);
     }
 
     // private helper functions________________________________________________

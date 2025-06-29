@@ -1,4 +1,4 @@
-package data.DTO;
+package data.DAO;
 
 import data.model.Answer;
 
@@ -9,11 +9,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnswerDTO {
+public class AnswerDAO {
 
     private final Connection connection;
 
-    public AnswerDTO(Connection connection) {
+    public AnswerDAO(Connection connection) {
         this.connection = connection;
     }
 

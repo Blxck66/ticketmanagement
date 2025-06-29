@@ -1,6 +1,6 @@
-import data.DTO.EmployeeDTO;
-import data.DTO.TicketDTO;
-import data.DTOs;
+import data.DAO.EmployeeDAO;
+import data.DAO.TicketDAO;
+import data.DAOs;
 import data.model.Employee;
 import data.model.Ticket;
 import logic.AuthenticationLogic;
@@ -67,8 +67,8 @@ public class Main {
             initRegistry(reg);
             System.out.println("Registry initialized");
 
-            DTOs.getInstance().init(con);
-            System.out.println("DTOs initialized");
+            DAOs.getInstance().init(con);
+            System.out.println("DAOs initialized");
 
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(() -> dealStrikes(), 0, 15, TimeUnit.MINUTES);
@@ -102,21 +102,21 @@ public class Main {
 
     private static void dealStrikes() {
 
-        TicketDTO ticketDTO = DTOs.getInstance().getTicketDTO();
-        List<Ticket> allPendingTickets = ticketDTO.getAllPendingTickets();
+        TicketDAO ticketDAO = DAOs.getInstance().getTicketDAO();
+        List<Ticket> allPendingTickets = ticketDAO.getAllPendingTickets();
         List<Ticket> expiredTickets = allPendingTickets.stream().filter(ticket -> ticket.getAssignmentDate().isBefore(
                 LocalDateTime.now().minusDays(3))).toList();
 
-        EmployeeDTO employeeDTO = DTOs.getInstance().getEmployeeDTO();
+        EmployeeDAO employeeDAO = DAOs.getInstance().getEmployeeDAO();
 
 
         for (Ticket expiredTicket : expiredTickets) {
             try {
                 ticketAssignmentLogic.reAssignTicketToEmployee(expiredTicket);
-                Employee updatedEmployee = employeeDTO.getEmployeeForEmployeeId(expiredTicket.getEmployeeId()).get();
+                Employee updatedEmployee = employeeDAO.getEmployeeForEmployeeId(expiredTicket.getEmployeeId()).get();
                 updatedEmployee.setStrikeCount(updatedEmployee.getStrikeCount() + 1);
-                employeeDTO.updateEmployee(updatedEmployee);
-                ticketDTO.updateTicket(expiredTicket);
+                employeeDAO.updateEmployee(updatedEmployee);
+                ticketDAO.updateTicket(expiredTicket);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

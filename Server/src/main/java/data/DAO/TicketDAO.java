@@ -1,4 +1,4 @@
-package data.DTO;
+package data.DAO;
 
 import data.model.Keyword;
 import data.model.Ticket;
@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TicketDTO {
+public class TicketDAO {
 
     private final Connection connection;
 
-    public TicketDTO(Connection connection) {
+    public TicketDAO(Connection connection) {
         this.connection = connection;
     }
 

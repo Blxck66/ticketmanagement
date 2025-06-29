@@ -1,6 +1,6 @@
 package logic.impl;
 
-import data.DTOs;
+import data.DAOs;
 import data.model.Customer;
 import data.model.Employee;
 import logic.AuthenticationLogic;
@@ -29,7 +29,7 @@ public class AuthenticationLogic_Impl extends UnicastRemoteObject implements Aut
 
     @Override
     public Employee authenticateEmployee(String LoginName, String password) throws RemoteException {
-        Optional<Employee> oEmployee = DTOs.getInstance().getEmployeeDTO().getEmployeeForLoginName(LoginName);
+        Optional<Employee> oEmployee = DAOs.getInstance().getEmployeeDAO().getEmployeeForLoginName(LoginName);
         if (oEmployee.isPresent() && oEmployee.get().getPassword().equals(password)) {
             return oEmployee.get();
         }
@@ -38,7 +38,7 @@ public class AuthenticationLogic_Impl extends UnicastRemoteObject implements Aut
 
     @Override
     public Customer authenticateCustomer(String loginName, String password) throws RemoteException {
-        Optional<Customer> oCustomer = DTOs.getInstance().getCustomerDTO().getCustomerForLoginName(loginName);
+        Optional<Customer> oCustomer = DAOs.getInstance().getCustomerDAO().getCustomerForLoginName(loginName);
         if (oCustomer.isPresent() && oCustomer.get().getPassword().equals(password)) {
             return oCustomer.get();
         }

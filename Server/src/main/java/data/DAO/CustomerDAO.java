@@ -1,19 +1,16 @@
-package data.DTO;
+package data.DAO;
 
 
 import data.model.Customer;
-import data.model.Employee;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-public class CustomerDTO {
+public class CustomerDAO {
 
     private final Connection connection;
 
-    public CustomerDTO(Connection connection) {
+    public CustomerDAO(Connection connection) {
         this.connection = connection;
     }
 
