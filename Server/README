@@ -1,0 +1,15 @@
+How to setup the server:
+
+1. Create a mariadb database.
+
+2. Execute the startup.sql script on the created database.
+
+3. Configure the Class Main:
+    2.1 Adjust the variable DB_URL and set it to the db url of the maria db you have created.
+        Default is DB_URL = "jdbc:mariadb://localhost:3306/ticketmanagement".
+    2.2 Adjust the variable DB_USER and set it to the db user of the maria db you have created
+        that as all read and write rights. Default is DB_USER = "root".
+
+4. Start the Server by running the main method of the class Main of the project Server.
+
+5. Start the Client by running the main method of the class Main of the project Client.
