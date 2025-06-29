@@ -63,9 +63,9 @@ public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements l
         List<Employee> employeesSorted = DTOs.getInstance().getEmployeeDTO().getEmployeesSorted();
         employeesSorted.removeIf(employee -> employee.getEmployeeId().equals(ticket.getEmployeeId()));
         ticket.setEmployeeId(employeesSorted.getFirst().getEmployeeId());
+        ticket.setIssueDate(LocalDateTime.now());
 
         DTOs.getInstance().getTicketDTO().updateTicket(ticket);
-
 
 
     }

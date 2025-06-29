@@ -63,6 +63,40 @@ public class TicketDTO {
         }
     }
 
+    public List<Ticket> getAllPendingTickets() {
+        String selectTicketsSQL = """
+                    SELECT TicketID, Description, IssueDate, State, CustomerID, EmployeeID, AssignmentDate
+                    FROM Ticket
+                    WHERE State = 'PENDING'
+                """;
+
+        List<Ticket> ticketList = new ArrayList<>();
+
+        try (PreparedStatement selectStmt = connection.prepareStatement(selectTicketsSQL)) {
+
+            try (ResultSet rs = selectStmt.executeQuery()) {
+                // 1. Durch die ResultSet iterieren und Ticket-Objekte erstellen
+                while (rs.next()) {
+                    Ticket ticket = new Ticket();
+                    ticket.setTicketID(rs.getLong("TicketID"));
+                    ticket.setDescription(rs.getString("Description"));
+                    ticket.setIssueDate(rs.getTimestamp("IssueDate").toLocalDateTime());
+                    ticket.setState(rs.getString("State"));
+                    ticket.setCustomerId(rs.getLong("CustomerID"));
+                    ticket.setEmployeeId(rs.getLong("EmployeeID"));
+                    ticket.setAssignmentDate(rs.getTimestamp("AssignmentDate").toLocalDateTime());
+
+                    // Ticket zur Liste hinzufügen
+                    ticketList.add(ticket);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ticketList;
+    }
 
     public void updateTicket(Ticket ticket) {
         String updateTicketSQL = """

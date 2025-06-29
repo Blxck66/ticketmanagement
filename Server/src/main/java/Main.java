@@ -1,4 +1,8 @@
+import data.DTO.EmployeeDTO;
+import data.DTO.TicketDTO;
 import data.DTOs;
+import data.model.Employee;
+import data.model.Ticket;
 import logic.AuthenticationLogic;
 import logic.TicketAssignmentLogic;
 import logic.ViewAccessLogic;
@@ -13,8 +17,13 @@ import java.rmi.registry.Registry;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -28,6 +37,8 @@ public class Main {
 
     //If the port is changed here in server, it needs also be changed in client.
     private static final int REGISTRY_PORT = 1099;
+
+    private static TicketAssignmentLogic_Impl ticketAssignmentLogic;
 
     public static void main(String[] args) throws ClassNotFoundException {
 
@@ -63,6 +74,11 @@ public class Main {
             System.out.println("Enter \"exit\" to stop the server.");
             Scanner scanner = new Scanner(System.in);
 
+
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleAtFixedRate(() -> dealStrikes(), 0, 15, TimeUnit.MINUTES);
+            System.out.println("Scheduler for dealing strikes configured.");
+
             while (!scanner.nextLine().equals("exit")) {
             }
 
@@ -82,8 +98,34 @@ public class Main {
         reg.bind(Arrays.asList(ViewAccessLogic.class.getName().split("\\.")).getLast(),
                 new ViewAccessLogic_Impl());
 
+        ticketAssignmentLogic = new TicketAssignmentLogic_Impl();
         reg.bind(Arrays.asList(TicketAssignmentLogic.class.getName().split("\\.")).getLast(),
-                new TicketAssignmentLogic_Impl());
+                ticketAssignmentLogic);
+    }
+
+    private static void dealStrikes() {
+
+        TicketDTO ticketDTO = DTOs.getInstance().getTicketDTO();
+        List<Ticket> allPendingTickets = ticketDTO.getAllPendingTickets();
+        List<Ticket> expiredTickets = allPendingTickets.stream().filter(ticket -> ticket.getAssignmentDate().isBefore(
+                LocalDateTime.now().minusDays(3))).toList();
+
+        EmployeeDTO employeeDTO = DTOs.getInstance().getEmployeeDTO();
+
+
+        for (Ticket expiredTicket : expiredTickets) {
+            try {
+                ticketAssignmentLogic.reAssignTicketToEmployee(expiredTicket);
+                Employee updatedEmployee = employeeDTO.getEmployeeForEmployeeId(expiredTicket.getEmployeeId()).get();
+                updatedEmployee.setStrikeCount(updatedEmployee.getStrikeCount() + 1);
+                employeeDTO.updateEmployee(updatedEmployee);
+                ticketDTO.updateTicket(expiredTicket);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
 

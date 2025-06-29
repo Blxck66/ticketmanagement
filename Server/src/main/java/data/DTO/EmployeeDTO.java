@@ -16,6 +16,25 @@ public class EmployeeDTO {
         this.connection = connection;
     }
 
+    public Optional<Employee> getEmployeeForEmployeeId(Long employeeId) {
+        String sql = "SELECT * FROM Employee WHERE EmployeeId = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setLong(1, employeeId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return Optional.of(new Employee(
+                        resultSet.getLong("EmployeeID"),
+                        resultSet.getString("LoginName"),
+                        resultSet.getString("Password"),
+                        resultSet.getLong("StrikeCount")
+                ));
+            }
+        } catch (SQLException ignored) {
+        }
+        return Optional.empty();
+    }
+
     public Optional<Employee> getEmployeeForLoginName(String loginName) {
         String sql = "SELECT * FROM Employee WHERE LoginName = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -74,6 +93,37 @@ public class EmployeeDTO {
         }
 
         return employees;
+    }
+
+    public void updateEmployee(Employee employee) {
+        String updateTicketSQL = """
+                    UPDATE Employee
+                    SET LoginName = ?, Password = ?, StrikeCount = ?
+                    WHERE EmployeeId = ?
+                """;
+
+        try (PreparedStatement updateStmt = connection.prepareStatement(updateTicketSQL)) {
+            // 1. Setzen des neuen Status, der EmployeeID und des AssignmentDate
+
+            updateStmt.setString(1, employee.getLoginName());
+            updateStmt.setString(2, employee.getPassword());
+            updateStmt.setLong(3, employee.getStrikeCount());
+            updateStmt.setLong(4, employee.getEmployeeId());
+
+
+            // 2. Update ausführen
+            updateStmt.executeUpdate();
+            connection.commit();
+
+        } catch (SQLException ignored) {
+            ignored.printStackTrace();
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ignored) {
+                ignored.printStackTrace();
+            }
+        }
     }
 
 }
