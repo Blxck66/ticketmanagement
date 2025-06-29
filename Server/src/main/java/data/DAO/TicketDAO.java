@@ -239,7 +239,7 @@ public class TicketDAO {
         return ticketList;
     }
 
-    public List<Ticket> getTicketsByKeywords(List<Keyword> keywords) {
+    public List<Ticket> getAnsweredTicketsByKeywords(List<Keyword> keywords) {
         // Wenn keine Keywords übergeben wurden, werfen wir eine Exception oder führen eine leere Abfrage aus
         if (keywords == null || keywords.isEmpty()) {
             throw new IllegalArgumentException("Die Liste der Keywords darf nicht leer sein.");
@@ -300,7 +300,7 @@ public class TicketDAO {
             e.printStackTrace();
         }
 
-        return ticketList;
+        return ticketList.stream().filter(ticket -> ticket.getState().equals("CLOSED")).toList();
     }
 
 

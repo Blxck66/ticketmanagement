@@ -44,7 +44,7 @@ public class ViewAccessLogic_Impl extends UnicastRemoteObject implements ViewAcc
 
     @Override
     public List<Ticket> getExampleAnsweredTicketsForKeywords(List<Keyword> keywords) {
-        return DAOs.getInstance().getTicketDAO().getTicketsByKeywords(keywords);
+        return DAOs.getInstance().getTicketDAO().getAnsweredTicketsByKeywords(keywords);
     }
 
     @Override
