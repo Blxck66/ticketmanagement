@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -71,22 +72,20 @@ public class Main {
             DTOs.getInstance().init(con);
             System.out.println("DTOs initialized");
 
-            System.out.println("Enter \"exit\" to stop the server.");
-            Scanner scanner = new Scanner(System.in);
-
-
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
             scheduler.scheduleAtFixedRate(() -> dealStrikes(), 0, 15, TimeUnit.MINUTES);
             System.out.println("Scheduler for dealing strikes configured.");
 
-            while (!scanner.nextLine().equals("exit")) {
-            }
+            Thread.currentThread().join();
 
         } catch (SQLException e) {
             System.out.println("Failed to build the connection to database!");
             throw new RuntimeException(e);
         } catch (RemoteException | AlreadyBoundException e) {
             System.out.println("Failed to build the registry!");
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            System.out.println("Unexpected thread error!");
             throw new RuntimeException(e);
         }
     }
