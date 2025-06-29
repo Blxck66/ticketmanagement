@@ -12,6 +12,7 @@ import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements logic.TicketAssignmentLogic {
@@ -49,7 +50,8 @@ public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements l
 
     @Override
     public void assignTicketToCustomer(Ticket ticket, Answer answer) throws RemoteException {
-        DTOs.getInstance().getTicketDTO().updateTicketStatus(ticket);
+        ticket.setState("ANSWERED");
+        DTOs.getInstance().getTicketDTO().updateTicket(ticket);
         DTOs.getInstance().getAnswerDTO().createAnswer(answer);
     }
 
@@ -62,13 +64,17 @@ public class TicketAssignmentLogic_Impl extends UnicastRemoteObject implements l
         employeesSorted.removeIf(employee -> employee.getEmployeeId().equals(ticket.getEmployeeId()));
         ticket.setEmployeeId(employeesSorted.getFirst().getEmployeeId());
 
+        DTOs.getInstance().getTicketDTO().updateTicket(ticket);
+
 
 
     }
 
     @Override
     public void unassignTicked(Ticket ticket) throws RemoteException {
-        //TODO: implement
+        ticket.setState("CLOSED");
+        ticket.setAssignmentDate(LocalDateTime.now());
+        DTOs.getInstance().getTicketDTO().updateTicket(ticket);
     }
 
     // private helper functions________________________________________________

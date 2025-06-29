@@ -21,10 +21,6 @@ public class Answer implements Serializable {
         this.ticketId = ticketId;
     }
 
-    public Answer() {
-
-    }
-
     public Long getAnswerId() {
         return answerId;
     }

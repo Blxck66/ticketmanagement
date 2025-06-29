@@ -1,15 +1,19 @@
-/*
+
 package gui.panel.employee;
 
+import data.model.Answer;
 import data.model.Employee;
 import data.model.Ticket;
 import gui.window.Mainframe;
 import logic.RemoteConnection;
+import logic.ViewAccessLogic;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -23,7 +27,15 @@ public class EmployeePanel extends JPanel {
     private final Employee employee;
 
     private JButton sendAnswerButton;
+    private JButton logoutButton;
 
+    private JList<Ticket> ticketList;
+
+    private JTextArea customerTextArea;
+    private JTextArea answerTextArea;
+    private JTextArea previousAnswersTextArea;
+
+    private DefaultListModel<Ticket> ticketListModel;
 
     public EmployeePanel(Mainframe mainframe, Employee employee) {
         this.mainframe = mainframe;
@@ -38,7 +50,7 @@ public class EmployeePanel extends JPanel {
     }
 
 
-    private void initPanel() {
+    private void initPanel() throws MalformedURLException, NotBoundException, RemoteException {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.BOTH;
@@ -52,22 +64,17 @@ public class EmployeePanel extends JPanel {
         this.add(ticketsLabel, gbc);
 
 
-        DefaultListModel<Ticket> ticketListModel = new DefaultListModel<>();
-        JList<Ticket> ticketList = new JList<>(ticketListModel);
-        ticketList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane ticketScrollPane = new JScrollPane(ticketList);
+        ticketListModel = new DefaultListModel<>();
+        this.ticketList = new JList<>(ticketListModel);
+        this.ticketList.addListSelectionListener(this::ticketSelected);
+        List<Ticket> pendingTicketsOfEmployee = RemoteConnection.getInstance().getViewAccessLogic().getPendingTicketsOfEmployee(this.employee);
+        pendingTicketsOfEmployee.forEach(ticketListModel::addElement);
+        this.ticketList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane ticketScrollPane = new JScrollPane(this.ticketList);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.gridheight = 3;
-
-        RemoteConnection
-
-//        List<Ticket> pendingTicketsOfEmployee = TicketViewLogic.getPendingTicketsOfEmployee(this.employee);
-        pendingTicketsOfEmployee.forEach(ticketListModel::addElement);
-
-        RemoteConnection.getInstance().getViewAccessLogic().getPendingTicketsOfEmpl
-
         this.add(ticketScrollPane, gbc);
 
 
@@ -79,11 +86,11 @@ public class EmployeePanel extends JPanel {
         gbc.gridheight = 1;
         this.add(customerTextLabel, gbc);
 
-        JTextArea customerTextArea = new JTextArea();
-        customerTextArea.setEditable(false);
-        customerTextArea.setLineWrap(true);
-        customerTextArea.setWrapStyleWord(true);
-        JScrollPane customerTextAreaScrollPane = new JScrollPane(customerTextArea);
+        this.customerTextArea = new JTextArea();
+        this.customerTextArea.setEditable(false);
+        this.customerTextArea.setLineWrap(true);
+        this.customerTextArea.setWrapStyleWord(true);
+        JScrollPane customerTextAreaScrollPane = new JScrollPane(this.customerTextArea);
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -96,8 +103,8 @@ public class EmployeePanel extends JPanel {
         gbc.weighty = 0.0;
         this.add(answerLabel, gbc);
 
-        JTextArea answerTextArea = new JTextArea();
-        answerTextArea.getDocument().addDocumentListener(new DocumentListener() {
+        this.answerTextArea = new JTextArea();
+        this.answerTextArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 onChange();
@@ -111,15 +118,11 @@ public class EmployeePanel extends JPanel {
             @Override
             public void changedUpdate(DocumentEvent e) {
             }
-
-            private void onChange() {
-                sendAnswerButton.setEnabled(!answerTextArea.getText().isBlank());
-            }
         });
-        answerTextArea.setLineWrap(true);
-        answerTextArea.setWrapStyleWord(true);
-        answerTextArea.setEditable(false);
-        JScrollPane answerScrollPane = new JScrollPane(answerTextArea);
+        this.answerTextArea.setLineWrap(true);
+        this.answerTextArea.setWrapStyleWord(true);
+        this.answerTextArea.setEditable(false);
+        JScrollPane answerScrollPane = new JScrollPane(this.answerTextArea);
         gbc.gridx = 1;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
@@ -133,10 +136,10 @@ public class EmployeePanel extends JPanel {
         gbc.gridy = 0;
         this.add(previousAnswersLabel, gbc);
 
-        JTextArea previousAnswersTextArea = new JTextArea(15, 25);
-        previousAnswersTextArea.setLineWrap(true);
-        previousAnswersTextArea.setWrapStyleWord(true);
-        previousAnswersTextArea.setEditable(false);
+        this.previousAnswersTextArea = new JTextArea(15, 25);
+        this.previousAnswersTextArea.setLineWrap(true);
+        this.previousAnswersTextArea.setWrapStyleWord(true);
+        this.previousAnswersTextArea.setEditable(false);
 
         JScrollPane previousAnswersTextAreaScrollPane = new JScrollPane(previousAnswersTextArea);
         gbc.gridx = 3;
@@ -152,18 +155,80 @@ public class EmployeePanel extends JPanel {
         gbc.gridheight = 1;
         this.add(loggedAsLabel, gbc);
 
-        JButton logoutButton = new JButton("Ausloggen");
+        this.logoutButton = new JButton("Ausloggen");
+        logoutButton.addActionListener(this::logoutClicked);
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 1;
         this.add(logoutButton, gbc);
 
-        sendAnswerButton = new JButton("Antwort abschicken");
+        this.sendAnswerButton = new JButton("Antwort abschicken");
+        this.sendAnswerButton.addActionListener(this::sendAnswerClicked);
         gbc.gridx = 1;
         gbc.gridy = 4;
         gbc.gridwidth = 1;
-        this.add(sendAnswerButton, gbc);
-        sendAnswerButton.setEnabled(false);
+        this.add(this.sendAnswerButton, gbc);
+        this.sendAnswerButton.setEnabled(false);
+    }
+
+    private void logoutClicked(ActionEvent event) {
+        this.mainframe.switchToLoginPanel();
+    }
+
+    private void ticketSelected(ListSelectionEvent e) {
+        Ticket selectedTicket = ticketList.getSelectedValue();
+        if (selectedTicket != null) {
+            customerTextArea.setText(selectedTicket.getDescription());
+
+            try {
+                ViewAccessLogic viewAccessLogic = RemoteConnection.getInstance().getViewAccessLogic();
+                List<Answer> lastAnswerOfTicket = viewAccessLogic.getAnswersOfTicket(selectedTicket, true);
+                List<Answer> otherAnswersOfTicket = viewAccessLogic.getAnswersOfTicket(selectedTicket, false);
+
+                if (!lastAnswerOfTicket.isEmpty()) {
+                    previousAnswersTextArea.setText(lastAnswerOfTicket.getFirst().getAnswerString());
+                }
+
+
+                for (Answer previousAnswer : otherAnswersOfTicket) {
+                    previousAnswersTextArea.setText(previousAnswersTextArea.getText()
+                            + "\n\n"
+                            + previousAnswer.getAnswerString());
+                }
+                answerTextArea.setEditable(true);
+                if (!answerTextArea.getText().isBlank()) {
+                    sendAnswerButton.setEnabled(true);
+                }
+
+            } catch (RemoteException | MalformedURLException | NotBoundException ignored) {
+                ignored.printStackTrace();
+            }
+        }
+    }
+
+    private void sendAnswerClicked(ActionEvent event) {
+
+        Ticket selectedTicket = ticketList.getSelectedValue();
+        if (selectedTicket != null) {
+            try {
+                RemoteConnection.getInstance().getTicketAssignmentLogic().assignTicketToCustomer(selectedTicket,
+                        new Answer(answerTextArea.getText(), true, selectedTicket.getTicketID()));
+
+                this.ticketListModel.removeElement(selectedTicket);
+                this.customerTextArea.setText("");
+                this.answerTextArea.setText("");
+                this.previousAnswersTextArea.setText("");
+                this.sendAnswerButton.setEnabled(false);
+                this.answerTextArea.setEnabled(false);
+
+            } catch (RemoteException | MalformedURLException | NotBoundException ignored) {
+                ignored.printStackTrace();
+            }
+
+        }
+    }
+
+    private void onChange() {
+        this.sendAnswerButton.setEnabled(!this.answerTextArea.getText().isBlank());
     }
 }
-*/

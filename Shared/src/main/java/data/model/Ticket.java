@@ -2,6 +2,7 @@ package data.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Ticket implements Serializable {
 
@@ -10,8 +11,8 @@ public class Ticket implements Serializable {
     private String state;
     private Long CustomerId;
     private Long EmployeeId;
-    private LocalDate IssueDate;
-    private LocalDate AssignmentDate;
+    private LocalDateTime IssueDate;
+    private LocalDateTime AssignmentDate;
 
 
     public Ticket(String description, Long customerId) {
@@ -19,7 +20,7 @@ public class Ticket implements Serializable {
         CustomerId = customerId;
     }
 
-    public Ticket(Long ticketID, String description, String state, Long customerId, Long employeeId, LocalDate issueDate, LocalDate assignmentDate) {
+    public Ticket(Long ticketID, String description, String state, Long customerId, Long employeeId, LocalDateTime issueDate, LocalDateTime assignmentDate) {
         this.ticketID = ticketID;
         this.description = description;
         this.state = state;
@@ -73,19 +74,19 @@ public class Ticket implements Serializable {
         EmployeeId = employeeId;
     }
 
-    public LocalDate getIssueDate() {
+    public LocalDateTime getIssueDate() {
         return IssueDate;
     }
 
-    public void setIssueDate(LocalDate issueDate) {
+    public void setIssueDate(LocalDateTime issueDate) {
         IssueDate = issueDate;
     }
 
-    public LocalDate getAssignmentDate() {
+    public LocalDateTime getAssignmentDate() {
         return AssignmentDate;
     }
 
-    public void setAssignmentDate(LocalDate assignmentDate) {
+    public void setAssignmentDate(LocalDateTime assignmentDate) {
         AssignmentDate = assignmentDate;
     }
 

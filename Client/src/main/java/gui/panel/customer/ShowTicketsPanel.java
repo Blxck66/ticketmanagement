@@ -226,7 +226,7 @@ public class ShowTicketsPanel extends JPanel {
         if (selectedTicket != null) {
             this.ticketDescriptionTextArea.setText(selectedTicket.getDescription());
             try {
-                Answer answer = RemoteConnection.getInstance().getViewAccessLogic().getAnswerOfTicket(selectedTicket);
+                Answer answer = RemoteConnection.getInstance().getViewAccessLogic().getAnswersOfTicket(selectedTicket, true).getFirst();
                 this.answerTextArea.setText(answer.getAnswerString());
                 this.solvedButton.setEnabled(true);
                 this.notSolvedButton.setEnabled(true);

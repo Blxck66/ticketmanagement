@@ -123,8 +123,7 @@ public class LoginPanel extends JPanel {
                 Employee authenticatedEmployeeId = RemoteConnection.getInstance().getAuthenticationLogic()
                         .authenticateEmployee(nameField.getText(), String.valueOf(passwordField.getPassword()));
                 if (authenticatedEmployeeId != null) {
-                    //TODO: Switch to employee view
-                    System.out.println("Authenticated Employee");
+                    this.mainframe.switchToEmployeePanel(authenticatedEmployeeId);
                 }
             }
         } catch (Exception ignored) {

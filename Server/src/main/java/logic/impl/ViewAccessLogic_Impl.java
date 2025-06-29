@@ -1,10 +1,7 @@
 package logic.impl;
 
 import data.DTOs;
-import data.model.Answer;
-import data.model.Customer;
-import data.model.Keyword;
-import data.model.Ticket;
+import data.model.*;
 import logic.ViewAccessLogic;
 
 import java.rmi.RemoteException;
@@ -51,7 +48,12 @@ public class ViewAccessLogic_Impl extends UnicastRemoteObject implements ViewAcc
     }
 
     @Override
-    public Answer getAnswerOfTicket(Ticket ticket) {
-        return null;
+    public List<Answer> getAnswersOfTicket(Ticket ticket, boolean finalAnswer) {
+        return DTOs.getInstance().getAnswerDTO().getAnswerByTicketId(ticket.getTicketID(), finalAnswer);
+    }
+
+    @Override
+    public List<Ticket> getPendingTicketsOfEmployee(Employee employee) throws RemoteException {
+        return DTOs.getInstance().getTicketDTO().getPendingTicketsByEmployee(employee.getEmployeeId());
     }
 }

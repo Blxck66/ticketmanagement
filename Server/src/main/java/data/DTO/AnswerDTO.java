@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AnswerDTO {
 
@@ -57,35 +59,34 @@ public class AnswerDTO {
         }
     }
 
-    public Answer getFinalAnswerByTicketId(long ticketId) {
+
+    public List<Answer> getAnswerByTicketId(long ticketId, boolean finalAnswer) {
         String selectAnswerSQL = """
                     SELECT AnswerID, AnswerString, IsFinal, TicketID
                     FROM Answer
-                    WHERE TicketID = ? AND IsFinal = TRUE
+                    WHERE TicketID = ? AND IsFinal = 
                 """;
+        selectAnswerSQL += finalAnswer ? "TRUE" : "FALSE";
+
+        List<Answer> answers = new ArrayList<>();
 
         try (PreparedStatement selectStmt = connection.prepareStatement(selectAnswerSQL)) {
             selectStmt.setLong(1, ticketId);  // Setzen der TicketID für das gewünschte Ticket
 
             try (ResultSet rs = selectStmt.executeQuery()) {
-                // Wenn eine Antwort gefunden wurde
-                if (rs.next()) {
-                    Answer answer = new Answer();
-                    answer.setAnswerId(rs.getLong("AnswerID"));
-                    answer.setAnswerString(rs.getString("AnswerString"));
-                    answer.setFinal(rs.getBoolean("IsFinal"));
-                    answer.setTicketId(rs.getLong("TicketID"));
-
-                    return answer;  // Die Antwort zurückgeben
-                } else {
-                    // Keine Antwort gefunden
-                    return new Answer();
+                while (rs.next()) {
+                    answers.add(new Answer(
+                            rs.getLong("AnswerID"),
+                            rs.getString("AnswerString"),
+                            rs.getBoolean("isFinal"),
+                            rs.getLong("TicketID")
+                    ));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new Answer();
+        return answers;
     }
 
 }

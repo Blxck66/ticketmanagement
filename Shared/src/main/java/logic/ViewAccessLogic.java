@@ -17,7 +17,7 @@ public interface ViewAccessLogic extends Remote {
 
     public abstract List<Ticket> getExampleAnsweredTicketsForKeywords(List<Keyword> keywords) throws RemoteException;
 
-    public abstract Answer getAnswerOfTicket(Ticket ticket) throws RemoteException;
+    public abstract List<Answer> getAnswersOfTicket(Ticket ticket, boolean finalAnswer) throws RemoteException;
 
     public abstract List<Ticket> getPendingTicketsOfEmployee(Employee employee) throws RemoteException;
 

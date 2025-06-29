@@ -1,6 +1,7 @@
 package gui.window;
 
 import data.model.Customer;
+import data.model.Employee;
 import data.model.Keyword;
 import data.model.Ticket;
 import gui.panel.LoginPanel;
@@ -43,6 +44,7 @@ public class Mainframe extends JFrame {
 
     public void switchToLoginPanel() {
         this.overviewPanel = null;
+        this.employeePanel = null;
 
         this.loginPanel = new LoginPanel(this);
         this.setContentPane(loginPanel);
@@ -82,6 +84,14 @@ public class Mainframe extends JFrame {
 
         this.exampleAnswersPanel = new ExampleAnswersPanel(this, ticket, customer, keywords);
         this.setContentPane(exampleAnswersPanel);
+        this.pack();
+    }
+
+    public void switchToEmployeePanel(Employee employee) {
+        this.loginPanel = null;
+
+        this.employeePanel = new EmployeePanel(this,employee);
+        this.setContentPane(employeePanel);
         this.pack();
     }
 }

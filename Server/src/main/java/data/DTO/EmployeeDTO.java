@@ -55,7 +55,7 @@ public class EmployeeDTO {
                 GROUP BY
                     e.EmployeeID, e.LoginName, e.Password, e.StrikeCount
                 ORDER BY
-                    OpenTicketCount ASC;
+                    OpenTicketCount DESC;
                 """;
         try (Statement statement = connection.createStatement()) {
 
